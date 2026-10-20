@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Món quà 20/10 nhỏ dành cho Em Bé Cam">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Vườn Thương Em Bé Cam</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&family=Dancing+Script:wght@500;700&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: one full-bleed watercolor garden on canvas; each chapter is a centered stage (max 520px) floating above it. Single deliberate light "paper & sky" world. */
+:root{
+  --sky:#cfe6f5; --paper:#fffaf3; --paper-2:#fbeee3;
+  --ink:#5b2a36; --rose:#8a3b52; --muted:#8a6070; --body:#4a3a40;
+  --cam:#ef6a3a; --cam-soft:#ffb36b; --leaf:#4f9a5b;
+  --ide:#0f111a; --ide-bar:#1a1d2b; --ide-fg:#d6dcf5; --night:#07080d;
+  --f-display:"Playfair Display", "Times New Roman", serif;
+  --f-script:"Dancing Script", "Segoe Script", cursive;
+  --f-body:"Be Vietnam Pro", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--sky);color:var(--body);font-family:var(--f-body);overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
+canvas.layer{position:fixed;inset:0;width:100%;height:100%;display:block}
+#garden{transition:filter .9s ease, transform .9s ease}
+#garden.soft{filter:blur(7px) saturate(1.05);transform:scale(1.04)}
+#fx{pointer-events:none;z-index:40}
+.scrim{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(255,250,243,.55),rgba(255,240,230,.15) 70%);opacity:0;transition:opacity .9s;pointer-events:none;z-index:1}
+.scrim.on{opacity:1}
+
+.stage{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,2.4vh,22px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:calc(env(safe-area-inset-top,0px) + 64px) calc(env(safe-area-inset-bottom,0px) + 28px);
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .8s ease, visibility 0s linear .8s}
+.stage.active{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .8s ease}
+.stage > *{max-width:520px;width:100%}
+
+/* ---------- buttons ---------- */
+.cta{appearance:none;border:0;cursor:pointer;font:600 1rem/1 var(--f-body);letter-spacing:.01em;color:#fff;
+  background:linear-gradient(135deg,var(--cam),#e8507a);padding:15px 26px;border-radius:999px;width:auto;max-width:none;
+  box-shadow:0 10px 28px rgba(232,80,122,.32),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .2s, box-shadow .2s, opacity .6s}
+.cta:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(232,80,122,.4)}
+.cta:active{transform:translateY(1px) scale(.98)}
+.cta:focus-visible,.icon-btn:focus-visible,.envelope:focus-visible,.book:focus-visible,.pol:focus-visible{outline:3px solid var(--cam-soft);outline-offset:4px}
+.cta.ghost{background:rgba(255,250,243,.85);color:var(--rose);box-shadow:0 6px 18px rgba(138,59,82,.15)}
+.cta.later{opacity:0;pointer-events:none}
+.cta.later.show{opacity:1;pointer-events:auto}
+.icon-btn{position:fixed;z-index:50;top:calc(env(safe-area-inset-top,0px) + 14px);right:calc(env(safe-area-inset-right,0px) + 14px);
+  width:44px;height:44px;border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;
+  background:rgba(255,250,243,.82);color:var(--rose);box-shadow:0 4px 14px rgba(0,0,0,.12);backdrop-filter:blur(6px)}
+.icon-btn svg{width:22px;height:22px}
+.icon-btn[aria-pressed="false"] .on,.icon-btn[aria-pressed="true"] .off{display:none}
+.icon-btn.dark{background:rgba(26,29,43,.85);color:var(--cam-soft)}
+
+/* ---------- type ---------- */
+.title{font:400 clamp(2rem,7.4vw,3.1rem)/1.15 var(--f-display);color:var(--rose);text-align:center;text-wrap:balance;margin:0;text-shadow:0 0 18px rgba(255,255,255,.9),0 0 3px rgba(255,255,255,.9)}
+.title em{font-style:italic}
+.script{font:700 clamp(2.6rem,11vw,4.4rem)/1.05 var(--f-script);color:var(--cam);text-shadow:0 0 20px rgba(255,255,255,.95),0 0 4px #fff}
+.hint{font:400 .95rem/1.5 var(--f-body);color:var(--muted);text-align:center;margin:0;text-shadow:0 0 10px #fff}
+.hint b{color:var(--cam);font-weight:600}
+.pulse{animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.45}}
+
+/* ---------- story (opening picture book) ---------- */
+#story{gap:clamp(10px,2vh,18px)}
+.book{background:var(--paper);border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(120,60,60,.22),0 0 0 1px rgba(239,106,58,.12);cursor:pointer}
+.book svg.scene{display:block;width:100%;height:auto;background:linear-gradient(180deg,#fde7e3,#fdf1ea)}
+.cap{min-height:5.6em;padding:14px 22px 18px;text-align:center;display:grid;place-items:center}
+.cap p{margin:0;font:400 clamp(1.05rem,4.4vw,1.3rem)/1.5 var(--f-display);color:var(--ink);text-wrap:balance;transition:opacity .35s, transform .35s}
+.cap p.out{opacity:0;transform:translateY(6px)}
+.cap p em{color:var(--cam);font-style:italic}
+.book-title{font:700 clamp(2.1rem,9vw,3rem)/1.05 var(--f-script);color:var(--cam);text-align:center;margin:0;text-shadow:0 0 18px #fff,0 0 3px #fff}
+.book-sub{font:400 .95rem var(--f-body);color:var(--muted);margin:0;text-align:center;text-shadow:0 0 10px #fff}
+.dots{display:flex;gap:8px;justify-content:center;width:auto!important}
+.dots i{width:8px;height:8px;border-radius:50%;background:rgba(138,59,82,.22);transition:background .3s,width .3s}
+.dots i.on{background:var(--cam);width:22px;border-radius:5px}
+
+/* characters: positions per step on .pos, idle bob on .bob */
+.scene .pos{transition:transform 1.1s cubic-bezier(.34,1.3,.5,1);transform-box:view-box}
+.scene .bob{animation:bob 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.scene .bob.b2{animation-delay:-1.2s}
+@keyframes bob{50%{transform:translateY(-5px) scaleY(1.02)}}
+.scene .roll{transition:transform 1.1s cubic-bezier(.3,.9,.4,1);transform-box:fill-box;transform-origin:center}
+.eyes{animation:blink 4.2s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.scene{--blush:.55}
+.scene.s2,.scene.s3{--blush:.95}
+.scene .fade{opacity:0;transition:opacity .6s}
+.scene.s0 .k0,.scene.s2 .k2,.scene.s3 .k3,.scene.s4 .k4{opacity:1}
+/* step positions */
+.scene.s0 #pMam{transform:translate(28px,0)} .scene.s0 #pCam{transform:translate(-28px,0)}
+.scene.s1 #pMam{transform:translate(70px,0)} .scene.s1 #pCam{transform:translate(260px,0)}
+.scene.s1 #rCam{transform:rotate(300deg)}
+.scene.s4 #pMam{transform:translate(-22px,0)} .scene.s4 #pCam{transform:translate(22px,0)}
+.floaty{animation:floaty 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.floaty.d1{animation-delay:-.9s}.floaty.d2{animation-delay:-1.7s}
+@keyframes floaty{0%{transform:translateY(6px) scale(.9);opacity:.2}50%{opacity:1}100%{transform:translateY(-16px) scale(1.05);opacity:0}}
+.scene.s0 .floaty,.scene.s2 .floaty{animation-play-state:running}
+.sprout{transform-box:fill-box;transform-origin:50% 100%;transform:scale(.1);transition:transform 2.4s cubic-bezier(.3,1.4,.5,1) .8s}
+.scene.s4 .sprout{transform:scale(1)}
+.can{transform-box:fill-box;transform-origin:20% 60%;animation:pour 2.4s ease-in-out infinite}
+@keyframes pour{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(14deg)}}
+.drop{animation:drop2 1s linear infinite}
+.drop.d1{animation-delay:-.33s}.drop.d2{animation-delay:-.66s}
+@keyframes drop2{from{transform:translateY(0);opacity:1}to{transform:translateY(34px);opacity:0}}
+.wiggle{animation:wig 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes wig{50%{transform:rotate(-4deg) translateY(-3px)}}
+
+.scene.s4 #wCam{animation:wig 1.1s ease-in-out infinite}
+/* ---------- photos ---------- */
+.board{position:relative;width:min(100%,440px,calc((100dvh - 260px) * .78));aspect-ratio:3/4}
+.pol{position:absolute;touch-action:none;cursor:grab}
+.pol:active{cursor:grabbing}
+.polaroid{background:#fffdf8;padding:5.5% 5.5% 0;box-shadow:0 18px 40px rgba(80,40,40,.3),0 2px 6px rgba(80,40,40,.15);transform:rotate(var(--r));transition:transform .3s}
+.polaroid img{display:block;width:100%;height:auto;filter:saturate(1.05) sepia(.06);pointer-events:none;-webkit-user-drag:none}
+.polaroid figcaption{font:700 clamp(1.05rem,4.6vw,1.6rem)/1 var(--f-script);color:#b4493a;text-align:center;padding:.55em 0 .6em;display:flex;justify-content:center;align-items:center;gap:.35em}
+.pol.small .polaroid figcaption{font-size:clamp(.9rem,3.8vw,1.25rem)}
+.tape{position:absolute;top:-12px;left:50%;width:30%;height:24px;transform:translateX(-50%) rotate(-4deg);background:repeating-linear-gradient(90deg,rgba(255,179,107,.85) 0 10px,rgba(255,206,160,.85) 10px 16px);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.pol.small .tape{height:18px;top:-9px}
+.t-pink{background:repeating-linear-gradient(90deg,rgba(246,163,184,.85) 0 10px,rgba(255,205,218,.85) 10px 16px)}
+.t-mint{background:repeating-linear-gradient(90deg,rgba(159,215,168,.85) 0 10px,rgba(206,238,209,.85) 10px 16px)}
+.orange{display:inline-block;width:.9em;height:.9em;border-radius:50%;background:radial-gradient(circle at 32% 30%,#ffc070,#ff7a1a 70%);position:relative;flex:none}
+.orange::after{content:"";position:absolute;width:.42em;height:.2em;background:var(--leaf);border-radius:50%;top:-.12em;right:-.05em;transform:rotate(-30deg)}
+#s-photos .pol{opacity:0}
+#s-photos.active .pol{animation:drop 1.1s cubic-bezier(.34,1.45,.5,1) forwards}
+#s-photos.active .pol.p2{animation-delay:.9s}
+#s-photos.active .pol.p3{animation-delay:1.25s}
+@keyframes drop{from{opacity:0;translate:0 -70vh;rotate:-18deg}60%{opacity:1}to{opacity:1;translate:0 0;rotate:0deg}}
+.doodle{position:absolute;pointer-events:none;width:13%;opacity:0}
+.doodle path{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:240;stroke-dashoffset:240}
+#s-photos.active .doodle{opacity:1;transition:opacity .2s 1.9s}
+#s-photos.active .doodle path{animation:draw 1s ease forwards 2s}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* ---------- letter ---------- */
+.envelope{position:relative;width:min(100%,400px);aspect-ratio:1.5;cursor:pointer;perspective:900px;border:0;padding:0;background:none;transition:transform .8s ease, opacity .6s ease .5s}
+.envelope:hover{transform:translateY(-4px) rotate(-1deg)}
+.env-back{position:absolute;inset:0;background:linear-gradient(160deg,#f9d9c6,#f2c2a8);border-radius:10px;box-shadow:0 22px 50px rgba(120,50,40,.28)}
+.env-front{position:absolute;inset:0;border-radius:10px;background:linear-gradient(160deg,#fbe3d3,#f6cdb5);clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:9%}
+.env-front span{font:700 clamp(1.3rem,5.5vw,1.9rem)/1 var(--f-script);color:#b4493a}
+.env-flap{position:absolute;inset:0 0 auto;height:60%;background:linear-gradient(180deg,#f7cfb8,#efb898);clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .7s ease;border-radius:10px 10px 0 0}
+.seal{position:absolute;left:50%;top:60%;width:17%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff9a52,var(--cam) 60%,#c84a20);box-shadow:0 4px 10px rgba(150,50,20,.4);display:grid;place-items:center;transition:opacity .3s}
+.seal svg{width:52%;fill:#fff6ee}
+.envelope.open .env-flap{transform:rotateX(180deg)}
+.envelope.open .seal{opacity:0}
+.envelope.gone{opacity:0;transform:translateY(40px) scale(.9);pointer-events:none}
+.letter{position:relative;background:linear-gradient(180deg,var(--paper),var(--paper-2));border-radius:14px;box-shadow:0 30px 70px rgba(90,40,50,.3);
+  max-height:calc(100dvh - 170px);overflow-y:auto;padding:clamp(22px,6vw,40px) clamp(20px,6vw,42px) 30px;text-align:center;
+  outline:1px solid rgba(239,106,58,.25);outline-offset:-12px;transform:translateY(30px) scale(.94);opacity:0;transition:transform .9s cubic-bezier(.2,.9,.3,1.1),opacity .7s;user-select:text}
+.letter.show{transform:none;opacity:1}
+.letter .stamp{position:absolute;top:18px;right:18px;width:clamp(74px,20vw,104px);padding:7px 7px 4px;background:#fff;rotate:6deg;
+  outline:2px dashed rgba(239,106,58,.55);outline-offset:-4px;box-shadow:0 3px 10px rgba(0,0,0,.14)}
+.letter .stamp img{display:block;width:100%}
+.letter .stamp small{display:block;font:700 .62rem var(--f-body);color:var(--cam);letter-spacing:.08em;padding-top:3px}
+.letter .greet{font:700 clamp(1.4rem,6vw,1.9rem)/1.2 var(--f-script);color:#b4493a;margin:clamp(112px,30vw,128px) 0 10px}
+.letter h2{font:400 clamp(1.55rem,6.6vw,2.2rem)/1.25 var(--f-display);color:var(--ink);margin:0;text-wrap:balance}
+.letter h2 em{color:var(--cam)}
+.letter .rule{display:flex;align-items:center;gap:10px;justify-content:center;margin:18px auto 16px;width:60%}
+.letter .rule::before,.letter .rule::after{content:"";flex:1;height:1px;background:rgba(180,73,58,.45)}
+.letter .rule svg{width:14px;fill:var(--cam)}
+.letter p{font:300 clamp(.95rem,3.9vw,1.06rem)/1.75 var(--f-body);color:var(--body);margin:0 auto 14px;max-width:34ch}
+.letter .sign{font:700 clamp(1.5rem,6.4vw,2rem)/1.2 var(--f-script);color:#b4493a;margin:20px 0 4px}
+.letter .from{font:italic 400 1rem var(--f-display);color:var(--muted);margin:0}
+.letter .ln{opacity:0;transform:translateY(10px)}
+.letter.show .ln{animation:rise .8s ease forwards;animation-delay:calc(.5s + var(--i) * .32s)}
+@keyframes rise{to{opacity:1;transform:none}}
+#s-letter .cta{margin-top:4px}
+
+/* ---------- finale ---------- */
+.heart-wrap{position:relative;width:min(78%,360px,calc((100dvh - 330px) * .95));aspect-ratio:1;cursor:pointer;filter:drop-shadow(0 0 26px rgba(255,120,100,.6));animation:beat 1.6s ease-in-out infinite;border:0;padding:0;background:none}
+.heart-wrap .h-bg{position:absolute;inset:-4%;background:#fff6ee;clip-path:url(#heartClip)}
+.heart-wrap{outline:none!important;-webkit-tap-highlight-color:transparent}
+.heart-wrap .h-line{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.heart-wrap .h-line path{fill:none;vector-effect:non-scaling-stroke}
+.heart-wrap:focus-visible .h-line .l2{stroke:var(--rose);stroke-width:4}
+.heart-wrap .mini{position:absolute;bottom:-4%;width:30%;height:auto;overflow:visible;pointer-events:none}
+.heart-wrap .mini.m1{left:-16%;rotate:-8deg}.heart-wrap .mini.m2{right:-16%;rotate:8deg}
+.heart-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;clip-path:url(#heartClip);filter:saturate(1.05)}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.05)}24%{transform:scale(.99)}36%{transform:scale(1.04)}}
+#s-final .title{font-weight:700}
+#s-final .script{text-align:center;margin:0}
+#s-final .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+#s-final .heart-wrap{opacity:0;transform:scale(.6)}
+#s-final.active .heart-wrap{animation:popin 1s cubic-bezier(.34,1.56,.64,1) forwards,beat 1.6s ease-in-out 1s infinite;opacity:1}
+@keyframes popin{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+.made{font:300 .75rem var(--f-body);color:var(--muted);margin:0;text-align:center}
+
+@media (max-height:640px){.stage{padding-block:calc(env(safe-area-inset-top,0px) + 58px) calc(env(safe-area-inset-bottom,0px) + 14px)}.code{min-height:auto}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <clipPath id="heartClip" clipPathUnits="objectBoundingBox">
+    <path d="M0.5,0.96 C0.5,0.96 0.03,0.67 0.03,0.33 C0.03,0.14 0.17,0.03 0.32,0.03 C0.41,0.03 0.47,0.08 0.5,0.16 C0.53,0.08 0.59,0.03 0.68,0.03 C0.83,0.03 0.97,0.14 0.97,0.33 C0.97,0.67 0.5,0.96 0.5,0.96 Z"/>
+  </clipPath>
+</svg>
+
+<canvas id="garden" class="layer" aria-hidden="true"></canvas>
+<div class="scrim" id="scrim"></div>
+<canvas id="fx" class="layer" aria-hidden="true"></canvas>
+
+<button class="icon-btn" id="music" aria-pressed="false" aria-label="Bật nhạc">
+  <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M2 2l20 20"/></svg>
+  <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+</button>
+
+<!-- 0 · story -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="gMam" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#d6f2bf"/><stop offset=".6" stop-color="#9fd683"/><stop offset="1" stop-color="#76bb5f"/></radialGradient>
+    <radialGradient id="gCam" cx="36%" cy="30%" r="75%"><stop offset="0" stop-color="#ffd08a"/><stop offset=".55" stop-color="#ff9a3c"/><stop offset="1" stop-color="#f0711f"/></radialGradient>
+    <linearGradient id="gGround" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe3a4"/><stop offset="1" stop-color="#8fca78"/></linearGradient>
+    <path id="hrt" d="M0,7 C-11,-1 -11,-10 -5.5,-10 C-2.5,-10 0,-7.5 0,-5 C0,-7.5 2.5,-10 5.5,-10 C11,-10 11,-1 0,7Z"/>
+  </defs>
+  <symbol id="artMam" viewBox="-60 -100 120 160" overflow="visible">
+    <ellipse cx="-15" cy="46" rx="11" ry="7" fill="#5b9e4c"/><ellipse cx="15" cy="46" rx="11" ry="7" fill="#5b9e4c"/>
+    <ellipse cx="-41" cy="12" rx="9" ry="13" fill="#8cc874" stroke="#4f8a43" stroke-width="2" transform="rotate(28 -41 12)"/>
+    <ellipse cx="41" cy="12" rx="9" ry="13" fill="#8cc874" stroke="#4f8a43" stroke-width="2" transform="rotate(-28 41 12)"/>
+    <ellipse cx="0" cy="2" rx="40" ry="46" fill="url(#gMam)" stroke="#4f8a43" stroke-width="2.5"/>
+    <ellipse cx="-14" cy="-20" rx="9" ry="15" fill="#fff" opacity=".3" transform="rotate(-22 -14 -20)"/>
+    <path d="M0,-44 C-2,-54 2,-62 0,-70" stroke="#4f8a43" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M0,-68 C-10,-84 -30,-82 -32,-72 C-24,-62 -8,-62 0,-68Z" fill="#7cc35f" stroke="#4f8a43" stroke-width="2"/>
+    <path d="M0,-70 C10,-88 32,-88 34,-78 C26,-66 8,-64 0,-70Z" fill="#a6dd84" stroke="#4f8a43" stroke-width="2"/>
+    <g class="eyes"><ellipse cx="-13" cy="-4" rx="4" ry="5.5" fill="#3d2b33"/><ellipse cx="13" cy="-4" rx="4" ry="5.5" fill="#3d2b33"/><circle cx="-11.6" cy="-6.2" r="1.5" fill="#fff"/><circle cx="14.4" cy="-6.2" r="1.5" fill="#fff"/></g>
+    <ellipse cx="-24" cy="9" rx="8" ry="5" fill="#ff8fa3" style="opacity:var(--blush,.55)"/><ellipse cx="24" cy="9" rx="8" ry="5" fill="#ff8fa3" style="opacity:var(--blush,.55)"/>
+    <path d="M-6,9 Q0,15 6,9" stroke="#3d2b33" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="artCam" viewBox="-60 -100 120 160" overflow="visible">
+    <ellipse cx="-14" cy="44" rx="10" ry="6.5" fill="#e0651e"/><ellipse cx="14" cy="44" rx="10" ry="6.5" fill="#e0651e"/>
+    <ellipse cx="-41" cy="14" rx="8.5" ry="12" fill="#ffac5c" stroke="#d9581a" stroke-width="2" transform="rotate(28 -41 14)"/>
+    <ellipse cx="41" cy="14" rx="8.5" ry="12" fill="#ffac5c" stroke="#d9581a" stroke-width="2" transform="rotate(-28 41 14)"/>
+    <circle cx="0" cy="4" r="42" fill="url(#gCam)" stroke="#d9581a" stroke-width="2.5"/>
+    <g fill="#ffd8a8" opacity=".75"><circle cx="20" cy="-14" r="1.6"/><circle cx="28" cy="2" r="1.6"/><circle cx="-26" cy="22" r="1.6"/><circle cx="12" cy="28" r="1.6"/><circle cx="-4" cy="-26" r="1.6"/><circle cx="-28" cy="-6" r="1.6"/></g>
+    <ellipse cx="-16" cy="-14" rx="9" ry="13" fill="#fff" opacity=".32" transform="rotate(-25 -16 -14)"/>
+    <path d="M0,-37 L2,-48" stroke="#6b4a2b" stroke-width="4" stroke-linecap="round"/>
+    <path d="M2,-46 C14,-66 36,-60 38,-52 C28,-42 12,-42 2,-46Z" fill="#7cc35f" stroke="#4f8a43" stroke-width="2"/>
+    <g fill="#f7799a" stroke="#d4507a" stroke-width="1.5"><path d="M-16,-34 L-30,-42 L-29,-26Z"/><path d="M-16,-34 L-3,-43 L-4,-26Z"/><circle cx="-16" cy="-34" r="3.6"/></g>
+    <g class="eyes"><ellipse cx="-13" cy="1" rx="4" ry="5.5" fill="#3d2b33"/><ellipse cx="13" cy="1" rx="4" ry="5.5" fill="#3d2b33"/><circle cx="-11.6" cy="-1.2" r="1.5" fill="#fff"/><circle cx="14.4" cy="-1.2" r="1.5" fill="#fff"/></g>
+    <ellipse cx="-25" cy="13" rx="8" ry="5" fill="#ff7f96" style="opacity:var(--blush,.55)"/><ellipse cx="25" cy="13" rx="8" ry="5" fill="#ff7f96" style="opacity:var(--blush,.55)"/>
+    <path d="M-5,13 Q0,19 5,13" stroke="#3d2b33" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<section class="stage active" id="story" aria-label="Truyện mở đầu">
+  <h1 class="book-title">Chuyện nhỏ của Mầm &amp; Bé Cam</h1>
+  <div class="book" id="book" role="button" tabindex="0" aria-label="Lật trang tiếp">
+    <svg class="scene s0" id="scene" viewBox="0 0 400 300" role="img" aria-label="Hạt Mầm và Bé Cam">
+      <g opacity=".9" fill="#fff"><ellipse cx="70" cy="52" rx="34" ry="12"/><ellipse cx="92" cy="44" rx="22" ry="14"/><ellipse cx="320" cy="70" rx="30" ry="10"/><ellipse cx="338" cy="62" rx="18" ry="12"/></g>
+      <path d="M0,246 Q100,228 200,240 T400,234 L400,300 L0,300Z" fill="url(#gGround)"/>
+      <g><circle cx="40" cy="262" r="5" fill="#f7a3b5"/><circle cx="40" cy="262" r="2" fill="#fff3c4"/><circle cx="78" cy="276" r="4" fill="#ffd29e"/><circle cx="352" cy="258" r="5" fill="#c4a5e6"/><circle cx="352" cy="258" r="2" fill="#fff3c4"/><circle cx="318" cy="280" r="4" fill="#f7a3b5"/><circle cx="250" cy="282" r="3.5" fill="#fff"/><circle cx="150" cy="284" r="3.5" fill="#ffd29e"/></g>
+      <!-- cover heart -->
+      <g class="fade k0"><use href="#hrt" transform="translate(200 110) scale(3)" fill="#ff7a8a"/><use href="#hrt" transform="translate(200 110) scale(3)" fill="none" stroke="#fff" stroke-width=".7"/></g>
+      <!-- sprout (step 4) -->
+      <g class="fade k4"><g class="sprout"><path d="M200,252 C198,238 202,228 200,214" stroke="#4f8a43" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M200,236 C190,226 180,230 180,236 C188,242 196,240 200,236Z" fill="#8cc874"/><path d="M200,230 C210,220 222,224 222,230 C214,236 204,234 200,230Z" fill="#a6dd84"/><circle cx="200" cy="210" r="8" fill="#ef7896"/><circle cx="200" cy="210" r="3" fill="#ffd6e1"/></g></g>
+      <!-- Mầm -->
+      <g transform="translate(130 206)"><g class="pos" id="pMam"><g class="bob">
+        <use href="#artMam" x="-60" y="-100" width="120" height="160"/>
+        <g class="fade k4"><g class="can"><path d="M58,-12 C66,-16 68,-6 60,-2" fill="none" stroke="#4c88c4" stroke-width="3"/><rect x="34" y="-16" width="26" height="22" rx="5" fill="#8fc3ee" stroke="#4c88c4" stroke-width="2"/><path d="M36,-8 L22,-20" stroke="#4c88c4" stroke-width="5" stroke-linecap="round"/><g fill="#8fc3ee"><circle class="drop" cx="20" cy="-14" r="2.6"/><circle class="drop d1" cx="17" cy="-12" r="2.2"/><circle class="drop d2" cx="23" cy="-11" r="2"/></g></g></g>
+      </g></g></g>
+      <!-- Bé Cam -->
+      <g transform="translate(270 206)"><g class="pos" id="pCam"><g class="roll" id="rCam"><g class="bob b2" id="wCam">
+        <use href="#artCam" x="-60" y="-100" width="120" height="160"/>
+      </g></g></g></g>
+      <!-- hearts (s0, s2) -->
+      <g class="fade k2" fill="#ff7a8a"><use href="#hrt" class="floaty" transform="translate(112 112) scale(1.2)"/><use href="#hrt" class="floaty d1" transform="translate(150 96) scale(.9)"/><use href="#hrt" class="floaty d2" transform="translate(186 120) scale(1.1)"/></g>
+      <!-- thought bubble (s3) -->
+      <g class="fade k3"><circle cx="164" cy="140" r="5" fill="#fff" stroke="#f3c9c0" stroke-width="2"/><circle cx="178" cy="120" r="8" fill="#fff" stroke="#f3c9c0" stroke-width="2"/>
+        <ellipse cx="236" cy="78" rx="70" ry="44" fill="#fff" stroke="#f3c9c0" stroke-width="2.5"/>
+        <path d="M212,104 L212,82" stroke="#4f8a43" stroke-width="3"/><circle cx="212" cy="74" r="14" fill="#ef7896"/><path d="M212,74 m-8,0 a8,8 0 1,1 8,8 a5,5 0 1,1 -5,-5" fill="none" stroke="#c2456a" stroke-width="2"/>
+        <rect x="242" y="70" width="34" height="28" rx="3" fill="#ff9a3c" stroke="#d9581a" stroke-width="2"/><rect x="256" y="70" width="6" height="28" fill="#f7799a"/><path d="M259,70 C250,58 244,64 252,70 M259,70 C268,58 274,64 266,70" fill="none" stroke="#f7799a" stroke-width="3"/>
+        <text x="236" y="52" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="15" fill="#b4493a">20/10</text></g>
+    </svg>
+    <div class="cap"><p id="cap">Một câu chuyện anh kể cho em nghe nhân ngày 20/10.</p></div>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+  <button class="cta" id="storyBtn">Mở truyện ▶</button>
+</section>
+
+<!-- 1 · rose & garden -->
+<section class="stage" id="s-rose" aria-label="Vườn hoa" style="justify-content:space-between">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;margin-top:2vh">
+    <h1 class="title" id="roseTitle">Từ một bông hoa nhỏ…</h1>
+    <div class="script" id="roseScript" style="display:none">vườn thương</div>
+    <p class="hint pulse" id="roseHint">Chạm vào bông hoa nhé</p>
+  </div>
+  <button class="cta later" id="toPhotos">Bông hoa đẹp nhất của anh →</button>
+</section>
+
+<!-- 2 · photos -->
+<section class="stage" id="s-photos" aria-label="Ảnh">
+  <h2 class="title" style="font-style:italic;font-size:clamp(1.6rem,6vw,2.4rem)">Nhưng bông hoa đẹp nhất…</h2>
+  <div class="board" id="board">
+    <div class="pol p1" style="left:8%;top:3%;width:84%;z-index:3" tabindex="0"><figure class="polaroid" style="--r:-3deg;margin:0"><span class="tape"></span><img src="assets/photo-full.jpg" alt="Em Bé Cam cầm bó hoa"><figcaption>là Em Bé Cam của anh <i class="orange"></i></figcaption></figure></div>
+    <div class="pol p2 small" style="left:1%;top:56%;width:46%;z-index:2" tabindex="0"><figure class="polaroid" style="--r:-7deg;margin:0"><span class="tape t-pink"></span><img src="assets/photo-face.jpg" alt="Cận mặt Em Bé Cam"><figcaption>xinh xỉu</figcaption></figure></div>
+    <div class="pol p3 small" style="left:53%;top:58%;width:46%;z-index:2" tabindex="0"><figure class="polaroid" style="--r:6deg;margin:0"><span class="tape t-mint"></span><img src="assets/photo-bouquet.jpg" alt="Bó hoa của em"><figcaption>hoa của em</figcaption></figure></div>
+    <svg class="doodle" style="left:-3%;top:-4%" viewBox="0 0 80 80"><path stroke="#ef6a3a" d="M40 68 C10 48 6 30 16 20 C26 10 38 16 40 28 C42 16 54 10 64 20 C74 30 70 48 40 68 Z"/></svg>
+    <svg class="doodle" style="right:-4%;top:46%" viewBox="0 0 80 80"><path stroke="#f06292" d="M40 68 C10 48 6 30 16 20 C26 10 38 16 40 28 C42 16 54 10 64 20 C74 30 70 48 40 68 Z"/></svg>
+  </div>
+  <p class="hint">Kéo thả ảnh để xếp lại · chạm để thả tim</p>
+  <button class="cta" id="toLetter">Mở thư anh gửi ✉</button>
+</section>
+
+<!-- 3 · letter -->
+<section class="stage" id="s-letter" aria-label="Thư">
+  <button class="envelope" id="envelope" aria-label="Mở thư">
+    <span class="env-back"></span>
+    <span class="env-front"><span>Gửi Em Bé Cam</span></span>
+    <span class="env-flap"></span>
+    <span class="seal"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg></span>
+  </button>
+  <p class="hint pulse" id="envHint">Chạm vào phong thư để mở</p>
+  <article class="letter" id="letter" hidden>
+    <div class="stamp"><img src="assets/photo-face.jpg" alt=""><small>20 · 10 · 2026</small></div>
+    <p class="greet ln" style="--i:0">Gửi Em Bé Cam thương mến,</p>
+    <h2 class="ln" style="--i:1">Mong những điều đẹp đẽ <em>luôn nở bên em.</em></h2>
+    <div class="rule ln" style="--i:2"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg></div>
+    <p class="ln" style="--i:3">Cảm ơn em đã đến và làm thế giới của anh dịu dàng hơn mỗi ngày.</p>
+    <p class="ln" style="--i:4">Nhân ngày 20/10, chúc em luôn xinh đẹp, luôn vui vẻ, được yêu thương và trân trọng thật nhiều.</p>
+    <p class="ln" style="--i:5">Anh không giỏi nói lời hoa mỹ, nên anh trồng cho em cả một vườn hoa. Mỗi bông là một lần anh nhớ em.</p>
+    <p class="ln" style="--i:6">Hôm nay, ngày mai và cả những ngày sau nữa, cho anh được thương em nhé.</p>
+    <p class="sign ln" style="--i:7">Yêu em nhiều lắm,</p>
+    <p class="from ln" style="--i:8">Anh của Em Bé Cam</p>
+  </article>
+  <button class="cta later" id="toFinal">Một điều nữa nè →</button>
+</section>
+
+<!-- 4 · finale -->
+<section class="stage" id="s-final" aria-label="Lời chúc">
+  <h2 class="title">Chúc mừng 20/10</h2>
+  <button class="heart-wrap" id="heart" aria-label="Thả tim"><span class="h-bg"></span><img src="assets/photo-heart.jpg" alt="Em Bé Cam"><svg class="h-line" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="M0.5,0.96 C0.5,0.96 0.03,0.67 0.03,0.33 C0.03,0.14 0.17,0.03 0.32,0.03 C0.41,0.03 0.47,0.08 0.5,0.16 C0.53,0.08 0.59,0.03 0.68,0.03 C0.83,0.03 0.97,0.14 0.97,0.33 C0.97,0.67 0.5,0.96 0.5,0.96 Z" stroke="#fff" stroke-width="7"/><path class="l2" d="M0.5,0.915 C0.5,0.915 0.065,0.65 0.065,0.335 C0.065,0.17 0.19,0.07 0.32,0.07 C0.405,0.07 0.465,0.12 0.5,0.2 C0.535,0.12 0.595,0.07 0.68,0.07 C0.81,0.07 0.935,0.17 0.935,0.335 C0.935,0.65 0.5,0.915 0.5,0.915 Z" stroke="#ff9a5c" stroke-width="2" stroke-dasharray="6 6"/></svg><svg class="mini m1" viewBox="-60 -100 120 160" aria-hidden="true"><use href="#artMam" x="-60" y="-100" width="120" height="160"/></svg><svg class="mini m2" viewBox="-60 -100 120 160" aria-hidden="true"><use href="#artCam" x="-60" y="-100" width="120" height="160"/></svg></button>
+  <p class="script">Yêu Em Bé Cam nhất trên đời</p>
+  <p class="hint">Chạm vào trái tim (hoặc bất cứ đâu) để thả tim</p>
+  <div class="row"><button class="cta ghost" id="replay">↺ Xem lại từ đầu</button></div>
+  <p class="made">made with ♥ &amp; code</p>
+</section>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const eOutC=x=>1-Math.pow(1-x,3);
+const eOutBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const mk=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const rgba=(h,a)=>{const[r,g,b]=hex(h);return`rgba(${r},${g},${b},${a})`};
+function heartPath(g,x,y,s){g.beginPath();for(let i=0;i<=60;i++){const a=i/60*Math.PI*2;const hx=16*Math.pow(Math.sin(a),3),hy=-(13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a));i?g.lineTo(x+hx*s/34,y+hy*s/34):g.moveTo(x+hx*s/34,y+hy*s/34)}g.closePath()}
+
+/* ---------------- rose sprites ---------------- */
+const PAL={pink:['#ef7896','#ffd6e1','#c2456a'],blush:['#f5a3b5','#fff0f3','#d4708a'],peach:['#f7a585','#fff0e2','#d4744f'],cam:['#ff8a2e','#ffe0b3','#d9581a'],
+  mint:['#9fd7a8','#effaee','#5ea870'],blue:['#8fc3ee','#eef7ff','#4c88c4'],lilac:['#c4a5e6','#f6efff','#8a63bb'],coral:['#f48a7c','#ffe3dd','#c95447']};
+function makeRose([base,light,dark],seed){const S=300,c=mk(S,S),g=c.getContext('2d'),r=rng(seed);g.translate(S/2,S/2);const k=S/360;
+  const hg=g.createRadialGradient(0,0,60*k,0,0,175*k);hg.addColorStop(0,rgba(base,.35));hg.addColorStop(1,rgba(base,0));g.fillStyle=hg;g.beginPath();g.arc(0,0,175*k,0,7);g.fill();
+  [[150,7],[124,6],[98,6],[74,5],[52,5],[32,4]].forEach(([R,n],li)=>{R*=k;for(let i=0;i<n;i++){const ang=i/n*Math.PI*2+li*.62+r()*.25;g.save();g.rotate(ang);
+    const cx=R*.42,rx=R*.62,ry=R*.5;const gr=g.createRadialGradient(cx-rx*.55,0,2,cx,0,rx*1.05);gr.addColorStop(0,dark);gr.addColorStop(.45,base);gr.addColorStop(1,light);
+    g.fillStyle=gr;g.beginPath();g.ellipse(cx,0,rx,ry,0,0,7);g.fill();g.lineWidth=2;g.strokeStyle=rgba(dark,.45);g.stroke();
+    g.lineWidth=2.6;g.strokeStyle='rgba(255,255,255,.55)';g.beginPath();g.ellipse(cx,0,rx*.92,ry*.88,0,-1.1,1.1);g.stroke();g.restore()}});
+  g.lineCap='round';for(let s=0;s<3;s++){g.beginPath();for(let a=0;a<Math.PI*5;a+=.08){const rr=(3+a*2.4)*k;const x=Math.cos(a+s*2.1)*rr,y=Math.sin(a+s*2.1)*rr;a?g.lineTo(x,y):g.moveTo(x,y)}g.strokeStyle=rgba(dark,.6-s*.15);g.lineWidth=2.6-s*.5;g.stroke()}
+  return c}
+const ROSES={};let si=1;for(const key in PAL){ROSES[key]=[makeRose(PAL[key],si*11),makeRose(PAL[key],si*17)];si++}
+const KEYS=['pink','blush','peach','cam','mint','blue','lilac','coral','cam','pink','blush','peach'];
+function makeCloud(seed,w,h){const c=mk(w,h),g=c.getContext('2d'),r=rng(seed);for(let i=0;i<40;i++){const x=w*.12+r()*w*.76,y=h*.45+(r()-.5)*h*.42,rad=h*(.14+r()*.22);
+  const gr=g.createRadialGradient(x,y,0,x,y,rad);gr.addColorStop(0,'rgba(255,255,255,.55)');gr.addColorStop(.6,'rgba(255,255,255,.25)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.beginPath();g.arc(x,y,rad,0,7);g.fill()}return c}
+const CLOUDS=[[makeCloud(3,520,200),-.1,.12,9],[makeCloud(7,420,170),.55,.24,-7],[makeCloud(9,560,220),-.2,.4,6],[makeCloud(13,380,150),.6,.52,-5],[makeCloud(21,480,190),.2,.03,4]];
+
+/* ---------------- canvas setup ---------------- */
+const cv=$('#garden'),g=cv.getContext('2d'),fx=$('#fx'),f=fx.getContext('2d');
+let W=0,H=0,DPR=1,S0=400,MAIN,GARDEN=[],PLANTED=[];
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=cv.clientWidth;H=cv.clientHeight;
+  for(const c of[cv,fx]){c.width=Math.round(W*DPR);c.height=Math.round(H*DPR)}layout()}
+function layout(){S0=Math.min(W,H*.62);
+  MAIN={x:W/2,y:H*.6,size:S0*.36,key:'pink',v:0,lean:S0*.05,dur:2.6,sway:0,leaf:.2,t0:MAIN?MAIN.t0:Infinity};
+  const r=rng(2010);GARDEN=[];const n=Math.round(clamp(W/S0,1,2.6)*58);
+  for(let i=0;i<n;i++){const y=H*.68+Math.pow(r(),.8)*H*.34,depth=(y-H*.68)/(H*.34),x=-W*.06+r()*W*1.12;
+    const size=S0*(.15+depth*.2+r()*.04),key=KEYS[Math.floor(r()*KEYS.length)],v=Math.floor(r()*2),sway=r()*6.28,lean=(r()-.5)*S0*.15,bud=r()<.12,leaf=r(),jit=r()*.5;
+    if(Math.abs(x-W/2)<S0*.14&&y<H*.75)continue;
+    const dist=Math.hypot(x-W/2,(y-H*.68)*1.4);
+    GARDEN.push({x,y,size,key,v,sway,lean,bud,leaf,dur:1.3,delay:dist/S0*1.1+jit,depth})}
+  GARDEN.sort((a,b)=>a.y-b.y);applyBloom()}
+let bloomAt=Infinity;
+function applyBloom(){for(const fl of GARDEN)fl.t0=bloomAt+fl.delay}
+function drawStem(x0,y0,x1,y1,lean,p,w){const cx=(x0+x1)/2+lean,cy=(y0+y1)/2,pt=s=>[(1-s)*(1-s)*x0+2*(1-s)*s*cx+s*s*x1,(1-s)*(1-s)*y0+2*(1-s)*s*cy+s*s*y1];
+  g.beginPath();const n=22;for(let i=0;i<=n*p;i++){const[x,y]=pt(i/n);i?g.lineTo(x,y):g.moveTo(x,y)}
+  g.strokeStyle='#4f9a5b';g.lineWidth=w;g.lineCap='round';g.stroke();g.strokeStyle='rgba(200,240,190,.35)';g.lineWidth=w*.35;g.stroke();return pt}
+function drawLeaf(x,y,len,ang,sc){if(sc<=0)return;g.save();g.translate(x,y);g.rotate(ang);g.scale(sc,sc);const gr=g.createLinearGradient(0,0,len,0);gr.addColorStop(0,'#3f8a4d');gr.addColorStop(1,'#8fcf86');
+  g.fillStyle=gr;g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(len*.5,-len*.42,len,0);g.quadraticCurveTo(len*.5,len*.42,0,0);g.fill();g.restore()}
+function drawBud(x,y,s,p,key){const[b,l]=PAL[key];g.save();g.translate(x,y);g.scale(p,p);g.fillStyle=b;g.beginPath();g.ellipse(0,-s*.1,s*.22,s*.32,0,0,7);g.fill();
+  g.fillStyle=l;g.beginPath();g.ellipse(-s*.06,-s*.16,s*.08,s*.2,-.2,0,7);g.fill();g.fillStyle='#5aa35f';g.beginPath();g.moveTo(-s*.24,0);g.quadraticCurveTo(0,s*.4,s*.24,0);g.quadraticCurveTo(0,s*.12,-s*.24,0);g.fill();g.restore()}
+function drawFlower(fl,t){if(!isFinite(fl.t0))return;const p=prog(t,fl.t0,fl.t0+fl.dur);if(!(p>0))return;const k=fl.size/250;
+  const hx=fl.x+Math.sin(t*1.3+fl.sway)*6*k,hy=fl.y,stemP=eOutC(clamp(p*1.6));
+  const pt=drawStem(fl.x-fl.lean*.3,H+30,hx,hy,fl.lean,stemP,Math.max(2,3+fl.size/45));
+  if(stemP>.4){const lp=eOutBack(prog(p,.3,.8));const[a,b]=pt(.55);drawLeaf(a,b,fl.size*.32,fl.leaf<.5?-2.6:-.5,lp);const[c,d]=pt(.75);drawLeaf(c,d,fl.size*.26,fl.leaf<.5?-.6:-2.5,lp)}
+  const bp=eOutBack(prog(p,.45,1));if(bp<=0)return;if(fl.bud){drawBud(hx,hy,fl.size*.7,bp,fl.key);return}
+  const s=fl.size*bp;g.save();g.translate(hx,hy);g.rotate(Math.sin(t*.6+fl.sway)*.08+(1-bp)*-.6);g.drawImage(ROSES[fl.key][fl.v],-s/2,-s/2,s,s);g.restore()}
+function butterfly(x,y,s,t,c1,c2){g.save();g.translate(x,y);const flap=.25+.75*Math.abs(Math.sin(t*11));g.rotate(Math.sin(t*2)*.2);
+  for(const side of[-1,1]){g.save();g.scale(side*flap,1);const gr=g.createRadialGradient(s*.4,-s*.35,1,s*.4,-s*.35,s*.6);gr.addColorStop(0,c2);gr.addColorStop(1,c1);
+    g.fillStyle=gr;g.beginPath();g.ellipse(s*.42,-s*.32,s*.42,s*.34,-.5,0,7);g.fill();g.fillStyle=c1;g.beginPath();g.ellipse(s*.32,s*.18,s*.26,s*.22,.5,0,7);g.fill();g.restore()}
+  g.fillStyle='#4a3340';g.beginPath();g.ellipse(0,0,s*.06,s*.36,0,0,7);g.fill();g.restore()}
+const PETALS=(()=>{const r=rng(77),cols=['#f6a3b8','#ffc8d6','#ffb07a','#f7d0c0','#ffd9a8','#f58fa8'];return Array.from({length:46},()=>({x:r(),y:r(),sp:50+r()*80,amp:16+r()*50,fr:.5+r()*1.2,ph:r()*6.28,s:7+r()*11,c:cols[Math.floor(r()*cols.length)],rot:r()*6}))})();
+
+function drawGarden(t){g.setTransform(DPR,0,0,DPR,0,0);
+  const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#a9d2ef');sky.addColorStop(.45,'#d6ebf6');sky.addColorStop(.78,'#f6efe4');sky.addColorStop(1,'#fbe7da');g.fillStyle=sky;g.fillRect(0,0,W,H);
+  const sun=g.createRadialGradient(W*.8,H*.15,0,W*.8,H*.15,W*.6);sun.addColorStop(0,'rgba(255,240,215,.55)');sun.addColorStop(1,'rgba(255,240,215,0)');g.fillStyle=sun;g.fillRect(0,0,W,H);
+  for(const[c,fx0,fy,v]of CLOUDS){const sc=Math.max(1,W/700);const w=c.width*sc,h=c.height*sc;let x=fx0*W+v*t;x=((x+w)%(W+w*2)+(W+w*2))%(W+w*2)-w;g.drawImage(c,x,fy*H,w,h)}
+  for(const fl of GARDEN)if(fl.depth<.15)drawFlower(fl,t);
+  drawFlower(MAIN,t);
+  for(const fl of GARDEN)if(fl.depth>=.15)drawFlower(fl,t);
+  for(const fl of PLANTED)drawFlower(fl,t);
+  if(t>bloomAt+1){g.globalAlpha=clamp(t-bloomAt-1);butterfly(W/2+Math.sin(t*.7)*W*.32,H*.42+Math.sin(t*1.1)*H*.07,S0*.07,t,'#ff9a3c','#ffe1b8');
+    butterfly(W*.3+Math.cos(t*.55)*W*.24,H*.55+Math.sin(t*.9+1)*H*.08,S0*.055,t+.3,'#f28aa6','#ffe6ee');g.globalAlpha=1}
+  const dens=clamp((t-bloomAt)/4);const n=Math.floor(PETALS.length*dens);
+  for(let i=0;i<n;i++){const p=PETALS[i];const y=((p.y*H+p.sp*t)%(H+60))-30,x=p.x*W+Math.sin(t*p.fr+p.ph)*p.amp;
+    g.save();g.translate(x,y);g.rotate(p.rot+t*p.fr);g.scale(1,.55+.45*Math.sin(t*p.fr*2+p.ph));g.fillStyle=p.c;g.globalAlpha=.85;g.beginPath();g.moveTo(0,-p.s);g.quadraticCurveTo(p.s*.8,0,0,p.s);g.quadraticCurveTo(-p.s*.8,0,0,-p.s);g.fill();g.restore()}
+}
+
+/* ---------------- particles ---------------- */
+const parts=[];const PCOL=['#ff8a2e','#f06292','#ffb3c6','#ffd29e','#ff6f61'];
+function burst(x,y,n=22,power=1){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=(160+Math.random()*360)*power;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-120*power,life:0,max:1.4+Math.random()*1,s:10+Math.random()*16,c:PCOL[i%PCOL.length],rot:(Math.random()-.5)*.6})}}
+function drawFx(dt){f.setTransform(DPR,0,0,DPR,0,0);f.clearRect(0,0,W,H);
+  for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.life+=dt;if(p.life>p.max){parts.splice(i,1);continue}
+    p.vx*=Math.pow(.25,dt);p.vy=p.vy*Math.pow(.25,dt)+380*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;
+    f.save();f.globalAlpha=clamp(1-p.life/p.max)*.95;f.translate(p.x,p.y);f.rotate(p.rot);heartPath(f,0,0,p.s);f.fillStyle=p.c;f.fill();f.restore()}}
+
+/* ---------------- loop ---------------- */
+const T0=performance.now();let last=T0,now=0;
+function frame(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;now=(ts-T0)/1000;
+  drawGarden(now);drawFx(dt);requestAnimationFrame(frame)}
+
+/* ---------------- music (Web Audio piano) ---------------- */
+let AC=null,master=null,musicOn=false,sched=null,nextBarT=0,barIdx=0;
+const midiF=m=>440*Math.pow(2,(m-69)/12);
+const NM=s=>{const N={C:0,D:2,E:4,F:5,G:7,A:9,B:11};return 12*(+s.slice(-1)+1)+N[s[0]]+(s.length===3?(s[1]==='b'?-1:1):0)};
+function initAudio(){if(AC)return;AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.32;
+  const rev=AC.createConvolver(),len=AC.sampleRate*2.4,buf=AC.createBuffer(2,len,AC.sampleRate);for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/AC.sampleRate*2.8)}
+  rev.buffer=buf;const wet=AC.createGain();wet.gain.value=.38;master.connect(AC.destination);master.connect(rev);rev.connect(wet);wet.connect(AC.destination)}
+function note(time,m,vel,dur){const f0=midiF(m),out=AC.createGain(),pan=AC.createStereoPanner?AC.createStereoPanner():null;
+  const decay=.5+1.6*Math.pow(60/Math.max(m,40),1.5);
+  out.gain.setValueAtTime(0,time);out.gain.linearRampToValueAtTime(vel,time+.006);out.gain.setTargetAtTime(0,time+.006,decay*.45);out.gain.setTargetAtTime(0,time+dur,.18);
+  [[1,1],[2,.42],[3,.2],[4,.09]].forEach(([h,a])=>{const o=AC.createOscillator(),gg=AC.createGain();o.frequency.value=f0*h*Math.sqrt(1+.0004*h*h);gg.gain.value=a;o.connect(gg);gg.connect(out);o.start(time);o.stop(time+dur+1.2)});
+  if(pan){pan.pan.value=clamp((m-62)/36,-.5,.5);out.connect(pan);pan.connect(master)}else out.connect(master)}
+const CH={C:[48,0],G:[43,0],Am:[45,1],F:[41,0]},PROG=['C','G','Am','F'];
+const MA=[[0,0,'E5',1.5],[0,1.5,'D5',.5],[0,2,'C5',2],[1,0,'D5',1.5],[1,1.5,'E5',.5],[1,2,'D5',1],[1,3,'B4',1],[2,0,'C5',1],[2,1,'E5',1],[2,2,'A5',2],[3,0,'G5',1.5],[3,1.5,'F5',.5],[3,2,'E5',1],[3,3,'C5',1]];
+const MB=[[0,0,'E5',1],[0,1,'G5',1],[0,2,'C6',2],[1,0,'B5',1.5],[1,1.5,'A5',.5],[1,2,'G5',2],[2,0,'A5',1],[2,1,'G5',1],[2,2,'E5',1],[2,3,'C5',1],[3,0,'D5',1],[3,1,'E5',1],[3,2,'F5',1],[3,3,'G5',1]];
+const BAR=2.2,Q=BAR/4;
+function scheduleBar(i,t){const name=PROG[i%4],[root,minor]=CH[name],third=minor?3:4;
+  [0,7,12,12+third,19,12+third,12,7].forEach((iv,k)=>note(t+k*BAR/8,root+iv,k?0.13:0.17,1.4));
+  const cyc=i%16;if(cyc<4)return;const phrase=(cyc<8||cyc>=12)?MA:MB,b=cyc%4;
+  for(const[bb,q,n,d]of phrase)if(bb===b)note(t+q*Q,NM(n),.26,d*Q+.3)}
+function startMusic(){initAudio();if(AC.state==='suspended')AC.resume();if(sched)return;nextBarT=AC.currentTime+.12;
+  sched=setInterval(()=>{while(nextBarT<AC.currentTime+.8){scheduleBar(barIdx++,nextBarT);nextBarT+=BAR}},120);setMusicUI(true)}
+function stopMusic(){if(sched){clearInterval(sched);sched=null}if(AC)AC.suspend();setMusicUI(false)}
+function setMusicUI(on){musicOn=on;const b=$('#music');b.setAttribute('aria-pressed',on);b.setAttribute('aria-label',on?'Tắt nhạc':'Bật nhạc')}
+$('#music').addEventListener('click',e=>{e.stopPropagation();musicOn?stopMusic():(AC&&AC.state==='suspended'&&(AC.resume()),startMusic())});
+
+/* ---------------- story ---------------- */
+const CAPS=['Một câu chuyện anh kể cho em nghe nhân ngày 20/10.',
+ 'Ngày xửa ngày xưa, ở một góc vườn nhỏ, có một hạt <em>Mầm</em> sống lặng lẽ một mình…',
+ 'Cho đến một ngày, có một quả cam bé xíu lăn tới. Mầm thương <em>Bé Cam</em> ngay từ lần đầu gặp.',
+ 'Ngày 20/10 sắp đến rồi. Mầm nghĩ mãi: tặng Bé Cam món quà gì cho thật đặc biệt đây?',
+ 'Rồi Mầm quyết định: <em>sẽ trồng cho Bé Cam cả một vườn hoa!</em>'];
+const BTN=['Mở truyện ▶','Tiếp →','Tiếp →','Tiếp →','Cùng Mầm trồng hoa →'];
+let step=0;
+function setStep(n){step=n;$('#scene').setAttribute('class','scene s'+n);
+  document.querySelectorAll('#dots i').forEach((d,i)=>d.classList.toggle('on',i===n));
+  const c=$('#cap');c.classList.add('out');setTimeout(()=>{c.innerHTML=CAPS[n];c.classList.remove('out')},reduce?0:300);
+  $('#storyBtn').textContent=BTN[n]}
+let advLock=0;
+function advance(){const t=performance.now();if(t-advLock<500)return;advLock=t;
+  if(step===0)startMusic();
+  if(step<4){setStep(step+1);const r=$('#book').getBoundingClientRect();if(step===2)burst(r.left+r.width*.4,r.top+r.height*.35,12,.6)}
+  else{MAIN.t0=now+.7;go('s-rose')}}
+$('#storyBtn').addEventListener('click',advance);
+$('#book').addEventListener('click',advance);
+$('#book').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();advance()}});
+
+/* ---------------- stages ---------------- */
+let state='story';
+function go(id){document.querySelectorAll('.stage').forEach(s=>s.classList.toggle('active',s.id===id));state=id;
+  const soft=id==='s-photos'||id==='s-letter'||id==='s-final';cv.classList.toggle('soft',soft&&id!=='s-final');$('#scrim').classList.toggle('on',soft);
+}
+
+function bloom(){if(bloomAt<Infinity)return;bloomAt=now;applyBloom();burst(MAIN.x,MAIN.y,26,1.1);
+  const t=$('#roseTitle');t.style.opacity=0;setTimeout(()=>{t.innerHTML='<em>…anh trồng cả một</em>';t.style.opacity=1;$('#roseScript').style.display='block';
+    $('#roseHint').innerHTML='cho <b>Em Bé Cam</b> · chạm vào vườn để trồng thêm hoa';$('#roseHint').classList.remove('pulse')},450);
+  setTimeout(()=>$('#toPhotos').classList.add('show'),2600)}
+$('#roseTitle').style.transition='opacity .45s';
+$('#s-rose').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;
+  if(bloomAt===Infinity){if(now>MAIN.t0+1.2)bloom();return}
+  const y=Math.max(e.clientY,H*.62);const depth=clamp((y-H*.68)/(H*.34));
+  PLANTED.push({x:e.clientX,y,size:S0*(.16+depth*.18),key:KEYS[Math.floor(Math.random()*KEYS.length)],v:Math.random()<.5?0:1,sway:Math.random()*6,lean:(Math.random()-.5)*S0*.12,bud:false,leaf:Math.random(),dur:1.2,t0:now});
+  if(PLANTED.length>40)PLANTED.shift();burst(e.clientX,e.clientY,10,.6)});
+$('#toPhotos').addEventListener('click',()=>go('s-photos'));
+$('#toLetter').addEventListener('click',()=>go('s-letter'));
+
+/* draggable polaroids */
+let zTop=10;
+document.querySelectorAll('.pol').forEach(el=>{let sx,sy,ox=0,oy=0,dragging=false,moved=0;el.resetPos=()=>{ox=oy=0;el.style.transform=''};
+  el.addEventListener('pointerdown',e=>{dragging=true;moved=0;sx=e.clientX-ox;sy=e.clientY-oy;el.setPointerCapture(e.pointerId);el.style.zIndex=++zTop;el.querySelector('.polaroid').style.transform='rotate(var(--r)) scale(1.04)'});
+  el.addEventListener('pointermove',e=>{if(!dragging)return;ox=e.clientX-sx;oy=e.clientY-sy;moved+=1;el.style.transform=`translate(${ox}px,${oy}px)`});
+  const up=e=>{if(!dragging)return;dragging=false;el.querySelector('.polaroid').style.transform='';if(moved<4)burst(e.clientX,e.clientY,14,.7)};
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,14,.7)}})});
+
+/* envelope */
+$('#envelope').addEventListener('click',()=>{const env=$('#envelope');if(env.classList.contains('open'))return;env.classList.add('open');$('#envHint').hidden=true;
+  setTimeout(()=>{env.classList.add('gone');const r=env.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,20,.9)},650);
+  setTimeout(()=>{env.hidden=true;const L=$('#letter');L.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>L.classList.add('show')))},1250);
+  setTimeout(()=>$('#toFinal').classList.add('show'),4600)});
+$('#toFinal').addEventListener('click',()=>{go('s-final');setTimeout(()=>{const r=$('#heart').getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,40,1.3);
+  setTimeout(()=>{burst(W*.22,H*.3,18,.8);burst(W*.78,H*.32,18,.8)},600)},500)});
+$('#s-final').addEventListener('pointerdown',e=>{if(e.target.closest('#replay'))return;burst(e.clientX,e.clientY,e.target.closest('#heart')?28:14,e.target.closest('#heart')?1.1:.7)});
+$('#replay').addEventListener('click',()=>{bloomAt=Infinity;PLANTED.length=0;applyBloom();MAIN.t0=Infinity;
+  const t=$('#roseTitle');t.textContent='Từ một bông hoa nhỏ…';$('#roseScript').style.display='none';$('#roseHint').textContent='Chạm vào bông hoa nhé';$('#roseHint').classList.add('pulse');$('#toPhotos').classList.remove('show');
+  const env=$('#envelope');env.hidden=false;env.classList.remove('open','gone');$('#envHint').hidden=false;const L=$('#letter');L.classList.remove('show');L.hidden=true;$('#toFinal').classList.remove('show');
+  document.querySelectorAll('.pol').forEach(p=>p.resetPos());setStep(1);go('story')});
+
+addEventListener('resize',resize);resize();requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
